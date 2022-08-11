@@ -26,5 +26,10 @@
    6. Install tzinfo-data (required for bundle install)
       1. Edit Gemfile. Add gem 'tzinfo-data' anywhere in file
       2. Run bundle install to add the new gem
-   6. bundle exec rake install
+   7. bundle exec rake install
+   8. bundle exec rake build
+   9. Test the application
+      1. bin/dashboard-server
+   10. Browse to localhost:3000 from the host
+       1. Ensure host has localhost-studio.code.org in /etc/hosts
 
