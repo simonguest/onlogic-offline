@@ -1,7 +1,7 @@
 # Code.Org Docker Dev Environment
 The Code.org Docker dev environment enables you to run and develop the Code.org platform in Docker containers.
 
-Doing so offers many advantages over setting up a development directly on your laptop. Using Docker, you don't need to worry about managing dependencies (e.g., setting up rbenv, managing versions of Ruby, or removing/installing Ruby gems). It's also easy to rebuild your development environment, which makes it possible to quickly test new changes, such as a new version of a Ruby gem. Finally, using Docker, it's also possible to have multiple versions of the Code.org dev environment and database running on the same machine.
+Doing so offers many advantages over setting up a development environment directly on your laptop. Using Docker, you don't need to worry about managing dependencies (e.g., setting up rbenv, managing versions of Ruby, or removing/installing Ruby gems). It's also easy to rebuild your development environment, which makes it possible to quickly test new changes, such as a new version of a Ruby gem. Finally, using Docker, it's also possible to have multiple versions of the Code.org dev environment and database running on the same machine.
 
 ## How does it work?
 
@@ -18,7 +18,7 @@ Note: As everything is containerized, you do not need Ruby or MySQL installed on
 ## Pre-requisite: Docker Desktop
 The only pre-requisite you need on your host is Docker desktop.  If you don't have it already installed and running, download it [here](https://www.docker.com/products/docker-desktop/).
 
-Note: This repo has been tested using Docker 20.10.9.
+Note: This repo has been tested using Docker version 20.10.9.
 
 ## Step 1: Build and run the containers
 - In this repo, git pull the Code.org repository as a sub-directory called src:
@@ -47,7 +47,7 @@ Note: This repo has been tested using Docker 20.10.9.
 	- Return to the first terminal window/tab and hit CTRL-C to shutdown the web and db containers.
 - Set the OAUTH_CODE on the host:
 	- ```export OAUTH_CODE=[copied value]```
-	- (If you don't want to have to repeat this, you can add this line to your ~/.bashrc or other terminal profile script.)
+	- (If you don't want to repeat this when you close the terminal window, add this to your ~/.bashrc or other terminal profile script.)
 - Restart the containers:
 	- ```docker compose up```
 
@@ -73,7 +73,7 @@ Note: This repo has been tested using Docker 20.10.9.
 	- ```bin/dashboard-server```
 - Open a web browser and browse to http://localhost-studio.code.org:3000
 
-## Exposing MySQL (on port 3306) to the host
+## Optional: Exposing MySQL (on port 3306) to the host
 If you have a MySQL client on your host machine (e.g., JetBrains Datagrip or SQLPro), you can also connect directly to the MySQL database running in the db container.
 
 To do this, edit your docker-compose.yml file and add the following section in the db configuration:
