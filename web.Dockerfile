@@ -11,11 +11,7 @@ RUN apt-get -y install rbenv \
 
 # Install Ruby 2.6.6 and Bundler 1.17.3
 RUN rbenv install 2.6.6 \
-    && eval "$(rbenv init -)" \
-    && rbenv global 2.6.6 \
-    && gem install bundler -v 1.17.3 \
-    && rbenv rehash \
-    && echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+    && echo -n '\n# rbenv init\neval "$(rbenv init -)"\n' >> ~/.bashrc
 
 # Install Node 14.17.1
 RUN apt-get -y install nodejs npm \
@@ -35,3 +31,16 @@ RUN apt-get -y install libsqlite3-dev libmysqlclient-dev mysql-client-core-5.7
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && ./aws/install
+
+# Make temporary directory and do a bundle install
+RUN mkdir -p /app/src
+COPY src/Gemfile /app/src/.
+COPY src/Gemfile.lock /app/src/.
+COPY src/.ruby-version /app/src/.
+RUN cd /app/src \
+    && eval "$(rbenv init -)" \
+    && gem install bundler -v 1.17.3 \
+    && bundle install
+
+# Add AWS_PROFILE env var to bashrc
+RUN echo -n '\n# AWS Profile\nexport AWS_PROFILE=cdo\n' >> ~/.bashrc

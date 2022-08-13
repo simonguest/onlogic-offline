@@ -1,2 +1,5 @@
 ./src
 ./data
+!src/Gemfile
+!src/Gemfile.lock
+!src/.ruby-version
