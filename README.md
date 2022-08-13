@@ -2,15 +2,14 @@
 
 1. Ensure $HOME/.aws on the host contains valid AWS credentials
 2. Delete ./data directory (for clean db)
-3. Delete ./rbenv directory (for clean gems)
-4. Git pull the ./src directory
-5. Update the Gemfile
+3. Git pull the ./src directory
+4. Update the Gemfile
    1. Remove mini_racer gem
    2. Update unf_ext to 0.0.8 (and update Gemfile.lock unf_ext also)
-6. Update config/development.yml.erb
+5. Update config/development.yml.erb
    1. Set db_writer to 'mysql://root:password@db/'
-7. ```docker compose up``` to build the web and db containers
-8. Once images are running:
+6. ```docker compose up``` to build the web and db containers
+7. Once images are running:
    1. Connect to the web tier: docker exec -ti web /bin/bash
    2. Confirm connection to db container using: mysql -h db -u root -p
    3. Bundle install
