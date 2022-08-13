@@ -1,79 +1,93 @@
-# Code.Org Docker Development Environment
+# Code.Org Docker Dev Environment
+The Code.org Docker dev environment enables you to run and develop the Code.org platform in Docker containers.
 
-## How it works
+Doing so offers many advantages over setting up a development directly on your laptop. Using Docker, you don't need to worry about managing dependencies (e.g., setting up rbenv, managing versions of Ruby, or removing/installing Ruby gems). It's also easy to rebuild your development environment, which makes it possible to quickly test new changes, such as a new version of a Ruby gem. Finally, using Docker, it's also possible to have multiple versions of the Code.org dev environment and database running on the same machine.
 
-1. Uses two containers...
+## How does it work?
 
-## Advantages of using Docker instead of your main machine
+The Code.org Docker dev environment uses docker compose to create two containers: web and db. 
 
-1. Don't worry about dependencies
-2. Can blow away environment and recreate very quickly
-3. Because of this, can quickly test new changes to the environment: e.g., new version of a ruby gem
-4. Multiple versions of your dev environment
-5. Multiple versions of the database
+The web container runs all of the code required for dashboard and pegasus. All of the source code is stored on the host machine under the "src" sub-directory.
 
-## Pre-requisites
+The db container runs MySql 5.7. All of the data files for MySql are stored on the host machine using the "data" sub-directory.
 
-1. Docker Desktop (tested on Docker 20.10.9)
-2. Ensure host has localhost-studio.code.org in /etc/hosts
-3. This repo, cloned locally
+<<nice-looking diagram here>>
 
-## Building the images
+Note: As everything is containerized, you do not need Ruby or MySQL installed on your host machine!
 
-1. Ensure $HOME/.aws on your host machine contains valid AWS credentials
-2. Git pull the Code.org repository as a sub-directory called src:
-   1. ```git clone git@github.com:code-dot-org/code-dot-org.git src```
-   2. If you don't care about history, you can also do a shallow clone:
-   3. ```git clone --depth=1 git@github.com:code-dot-org/code-dot-org.git src```
-3. Update src/Gemfile
-   1. Remove mini_racer gem (I really don't think we use this any more)
-   2. Update unf_ext to 0.0.8 (and also update Gemfile.lock unf_ext from 0.0.7.2)
-   3. Add gem 'tzinfo-data' to Gemfile
-4. Update src/config/development.yml.erb
-   1. Set db_writer to 'mysql://root:password@db/'
-5. ```docker compose build``` to build both the web and db containers
+## Pre-requisite: Docker Desktop
+The only pre-requisite you need on your host is Docker desktop.  If you don't have it already installed and running, download it [here](https://www.docker.com/products/docker-desktop/).
 
-## Setting the AWS OAUTH_CODE (required first time)
+Note: This repo has been tested using Docker 20.10.9.
 
-1. Start the containers:
-   1. ```docker compose up```
-2. Connect to the Web container:
-   1. ```docker exec -ti web /bin/bash```
-3. Configure AWS credentials
-   1. ```cd /app/src```
-   2. ```bin/aws_access```
-   3. If prompted, copy and paste the URL into a separate browser window and copy the returned OAUTH_CODE.
-4. Stop the containers
-   1. Press CTRL-C in the docker compose window to stop the web and db containers
-5. Set the OAUTH_CODE on the host:
-   1. ```export OAUTH_CODE=[copied value]```
-6. Start the containers again:
-   1. ```docker compose up```
+## Step 1: Build and run the containers
+- In this repo, git pull the Code.org repository as a sub-directory called src:
+  - ```git clone git@github.com:code-dot-org/code-dot-org.git src```
+- Edit src/Gemfile:
+	- Remove mini_racer gem (I really don't think we use this any more)
+	- Update unf_ext to 0.0.8 (and also update Gemfile.lock unf_ext from 0.0.7.2)
+	- Add gem 'tzinfo-data' (this is required for db seeding)
+- Edit src/config/development.yml.erb
+	- Set db_writer to ```'mysql://root:password@db/'``` (this points the development environment to the db container vs. the local machine).
+- Build the containers:
+	- ```docker compose build```
+- Run the containers:
+	- ```docker compose up```
+	- You'll need to open a new terminal window/tab to continue with the rest of the setup.
 
-## Seeding the db (required first time)
+## Step 2: Configure AWS credentials
+- Ensure $HOME/.aws on your host machine contains valid AWS credentials. If you don't already have this setup, you can find instructions [here](https://docs.google.com/document/d/1dDfEOhyyNYI2zIv4LI--ErJj6OVEJopFLqPxcI0RXOA/edit#heading=h.nbv3dv2smmks).
+- Connect to the web container:
+	- ```docker exec -ti web /bin/bash```
+- Run the aws_access script:
+	- ```cd /app/src```
+	- ```bin/aws_access```
+	- When prompted, copy and paste the URL into a separate browser window and copy the returned OAUTH_CODE to the clipboard.
+- Stop the containers
+	- Return to the first terminal window/tab and hit CTRL-C to shutdown the web and db containers.
+- Set the OAUTH_CODE on the host:
+	- ```export OAUTH_CODE=[copied value]```
+	- (If you don't want to have to repeat this, you can add this line to your ~/.bashrc or other terminal profile script.)
+- Restart the containers:
+	- ```docker compose up```
 
-1. Connect to the Web container:
-   1. ```docker exec -ti web /bin/bash```
-2. Rake install:
-   1. ```cd /app/src```
-   2. ```bundle exec rake install```
+## Step 3: Seed the db
+- Connect to the web container:
+	- ```docker exec -ti web /bin/bash```
+- Rake install:
+	- ```cd /app/src```
+	- ```bundle exec rake install```
 
-## Building the web package
+## Step 4: Build the web package
+- Connect to the web container:
+	- ```docker exec -ti web /bin/bash```
+- Rake build:
+	- ```cd /app/src```
+	- ```bundle exec rake build```
 
-1. Connect to the Web container:
-   1. ```docker exec -ti web /bin/bash```
-2. Rake build:
-   1. ```bundle exec rake build```
+## Step 5: Run the server
+- Connect to the web container:
+	- ```docker exec -ti web /bin/bash```
+- Run the dashboard server script:
+	- ```cd /app/src```
+	- ```bin/dashboard-server```
+- Open a web browser and browse to http://localhost-studio.code.org:3000
 
-## Running the server
+## Exposing MySQL (on port 3306) to the host
+If you have a MySQL client on your host machine (e.g., JetBrains Datagrip or SQLPro), you can also connect directly to the MySQL database running in the db container.
 
-1. Connect to the Web container:
-   1. ```docker exec -ti web /bin/bash```
-2. Run the dashboard server:
-   1. ```bin/dashboard-server```
-3. Open web browser and browse to http://localhost-studio.code.org:3000
+To do this, edit your docker-compose.yml file and add the following section in the db configuration:
 
-## Troubleshooting
+```
+ports:
+  - "3306:3306"
+```
 
-1. Confirm connection to db container using: mysql -h db -u root -p
+Stop and restart the containers, and your db container will now be accessible on localhost:3306. Use the credentials specified in the docker-compose.yml file.
 
+Note: The db container won't start if you already have an existing MySQL installation on your host machine (as port 3306 will already be in use). To overcome this, either uninstall MySQL on the host, or bind to a port other than 3306:
+
+```
+ports:
+  - "3307:3306"
+```
