@@ -1,9 +1,9 @@
 <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" width=200>
 
 # Code<span>.org Docker Dev Environment
-The Code<span>.org Docker dev environment enables you to run and develop on the Code<span>.org platform on your laptop, using Docker containers.
+The Code<span>.org Docker dev environment enables you to run and develop on the Code<span>.org platform using Docker containers.
 
-Doing so offers many advantages over setting up a development environment directly on your laptop. This include:
+Doing so offers many advantages over setting up a development environment directly on your laptop. These include:
 
 - No need to worry about managing dependencies (e.g., setting up rbenv, managing versions of Ruby, or removing/installing Ruby gems).
 - Rebuilding your development environment is scripted, which makes it easy to test new changes, such as a new version of a Ruby gem or even a new version of MySQL. 
@@ -15,25 +15,27 @@ Doing so offers many advantages over setting up a development environment direct
 
 ## How does it work?
 
-The Code<span>.org Docker dev environment uses docker compose to create two containers: web and db. These both run on your host laptop.
+The Code<span>.org Docker dev environment uses docker compose to create two containers: web and db. 
 
 The web container runs all of the code required for dashboard and pegasus. All of the source code is stored on the host laptop under the "src" sub-directory.
 
 The db container runs MySQL 5.7. All of the data files for MySQL are stored on the host laptop using the "data" sub-directory.
 
-Docker networking provides a connection between the two containers.
+Docker networking provides a connection between the two containers. The db container exposes port 3306 for MySQL access to the web container.
 
-<<nice-looking diagram here>>
+<img src="./containers.png" width=400>
 
 ## Pre-requisite: Docker Desktop
 The only pre-requisite you need on your host laptop is Docker desktop.  If you don't have it already installed and running, you can download it [here](https://www.docker.com/products/docker-desktop/).
 
 Note: This repo has been tested using Docker version 20.10.9.
 
+To get everything setup, follow these five steps:
+
 ## Step 1: Build and run the containers
 - Open a terminal and clone this repo:
 	- ```git clone git@github.com:simonguest/codeorg-docker-dev.git```
-- CD to this directory, git clone the Code<span>.org repository as a sub-directory called src:
+- Within this directory, git clone the Code<span>.org repository as a sub-directory called src:
 	- ```cd codeorg-docker-dev.git```
 	- ```git clone git@github.com:code-dot-org/code-dot-org.git src```
 - Edit src/Gemfile:
@@ -46,7 +48,8 @@ Note: This repo has been tested using Docker version 20.10.9.
 	- ```docker compose build```
 - Run the containers:
 	- ```docker compose up```
-	- You'll need to open a new terminal window/tab to continue with the rest of the setup.
+
+You'll then need to open a new terminal window/tab to continue with the rest of the setup.
 
 ## Step 2: Configure AWS credentials
 - Ensure $HOME/.aws on your host laptop contains valid AWS credentials. You probably already have this setup, but if you don't, you can find instructions [here](https://docs.google.com/document/d/1dDfEOhyyNYI2zIv4LI--ErJj6OVEJopFLqPxcI0RXOA/edit#heading=h.nbv3dv2smmks).
@@ -56,10 +59,10 @@ Note: This repo has been tested using Docker version 20.10.9.
 	- ```cd /app/src```
 	- ```bin/aws_access```
 	- When prompted, copy and paste the URL into a separate browser window and copy the returned OAUTH_CODE to the clipboard.
-- Stop the containers
+- Stop the containers:
 	- Return to the first terminal window/tab and hit CTRL-C to shutdown the web and db containers.
-- Set the OAUTH_CODE on the host:
-	- ```export OAUTH_CODE=[copied value]```
+- Within this window/tab, set the OAUTH_CODE on the host:
+	- ```export OAUTH_CODE=copied value```
 	- (If you don't want to repeat this when you close the terminal window, add this to your ~/.bashrc or other terminal profile script.)
 - Restart the containers:
 	- ```docker compose up```
@@ -98,7 +101,7 @@ ports:
 
 Stop and restart the containers, and your db container will now be accessible on localhost:3306. Use the credentials specified in the docker-compose.yml file.
 
-Note: The db container won't start if you already have an existing MySQL installation on your host laptop (as port 3306 will already be in use). To overcome this, either uninstall MySQL on the host, or bind to a port other than 3306:
+Note: The db container will fail to start if you already have an existing MySQL installation on your host laptop (as port 3306 will already be in use). To overcome this, either uninstall MySQL on the host, or bind to a port other than 3306:
 
 ```
 ports:
@@ -109,11 +112,11 @@ ports:
 
 #### Q: If I delete the containers, does it delete any data?
 
-No, all data resides on the host laptop and mounted by the containers when they start. Source is kept in the ./src folder. Database files are kept in the ./data folder.
+No, all data resides on the host laptop and is mounted by the containers when they start. Source is kept in the ./src folder. MySQL database files are kept in the ./data folder.
 
-#### Q: Where do I set my development environment to point to?
+#### Q: Where do I set my IDE to point to?
 
-Use your preferred IDE to make changes in the ./src folder - just as you would if you were developing on your host laptop. 
+Use your preferred IDE to open the ./src folder - just as you would if you were developing on your host laptop. As this is a mounted volume in the web container, any changes are reflected immediately.
 
 #### Q: Do I need to go through all these steps every time?
 
@@ -129,6 +132,12 @@ And in another terminal window/tab, run the dashboard-server script.
 docker exec -ti web /bin/bash
 cd /app/src
 bin/dashboard-server
+```
+
+Once you are done, you can either press CTRL-C in the original window to stop the containers or use:
+
+```
+docker compose down
 ```
 
 #### Q: How do I rebuild my database?
@@ -153,7 +162,7 @@ docker compose build
 
 #### Q: Is using Docker slower than developing on my laptop?
 
-There should be little noticeable performance difference between developing using Docker and on your host laptop. Older versions of Docker used to have issues with mounting large volumes, but this has since been resolved with VirtioFS.
+There should be little noticeable performance difference between developing using Docker and on your host laptop. Older versions of Docker used to have performance issues when mounting large volumes, but this has since been resolved with VirtioFS.
 
 #### Q: Do I need to install Ruby and/or MySQL on my host laptop?
 
@@ -161,7 +170,7 @@ No! The only required dependency on the host laptop is Docker desktop.
 
 #### Q: Does this work on Windows-based PCs?
 
-It should, but this README needs to include the Windows-equivalent commands. Volunteers welcome :)
+It should, but this README needs to include the Windows-equivalent commands and/or how this would work with WSL. PRs welcome :)
 
 #### Q: Does this work for M1-based Macs?
 

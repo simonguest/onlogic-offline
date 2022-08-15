@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:bionic
+FROM ubuntu:bionic
 
 # Additional required packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \

@@ -19,7 +19,7 @@ services:
   db:
     container_name: db
     hostname: db
-    image: biarms/mysql:5
+    image: biarms/mysql:5.7.30
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
