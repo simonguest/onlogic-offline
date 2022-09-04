@@ -26,6 +26,10 @@ Add the DHCP range to /etc/dnsmasq.conf:
 
 ```dhcp-range=192.168.4.2,192.168.4.100,255.255.255.0,24h```
 
+And map a domain name to the host serving the content:
+
+```address=/offline.code.org/192.168.4.1```
+
 Start the dnsmasq service
 
 ```sudo systemctl start dnsmasq```
