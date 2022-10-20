@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocker Client</title>
+</head>
+<body>
+<h1>Code.org Offline Websocket Test</h1>
+<textarea id="log" name="log" rows="5" cols="33"></textarea>
+</body>
+<script>
+
+    let socket = new WebSocket('ws://192.168.4.1:9000');
+    const log = document.getElementById('log');
+
+    socket.addEventListener('open', function (event) {
+        socket.send('Connection Established');
+        const intervalId = setInterval(() => {
+            socket.send(`${Date.now()}: Hello World`);
+        }, 1000);
+    });
+
+    socket.addEventListener('message', function (event) {
+        console.log(event.data);
+        log.value += event.data + "\n";
+    });
+
+</script>
+</html>
