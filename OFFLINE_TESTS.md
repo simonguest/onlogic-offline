@@ -19,5 +19,11 @@
 
 `cd /mnt/sda/offline-test/websocket`
 
+* Start websocket server in background
+
+`python server.py &`
+* Start web server
+
+`python -m http.server`
 
 
